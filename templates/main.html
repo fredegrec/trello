@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flask Template Example</title>
+    <script>
+	window.onload = function() {
+		var form = document.createElement("form");
+		var element = document.createElement("input");
+		form.method = "POST";
+		element.value = window.location.hash;
+		element.id = "token";
+		element.name = "token";
+		form.appendChild(element);
+		document.body.appendChild(form);
+		form.submit();
+		return false;
+	}
+    </script>
+  </head>
+  <body>
+	  <h1>Ошибка авторизации</h1>
+  </body>
+</html>
