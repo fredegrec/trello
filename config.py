@@ -1,34 +1,63 @@
-BOT_TOKEN = 'd2ae02c315b4a91016d21e7f8aee5cfc20e5e63b'
+BOT_TOKEN = ''
 BOT_ENDPOINT = 'demo-eem.transmit.im'
-DBNAME = 'botstrello'
+DBNAME = 'trellobot'
 MONGODBLINK = 'mongodb://localhost:27017/'
 LOGS_FILE = 'trellobot.logs'
 
 #trello
 APP_KEY = '079a5558609ec2719aa62412b30022fc' #trello's admin api key https://trello.com/app-key
-ORIGIN = 'http://209.97.150.98:5000' # server address where the bot code is running(for example, http://ip:port), you need to insert it into allowed origins of the  trello's admin's account on the page https://trello.com/app-key
-HOST = '209.97.150.98' #server IP where the bot code is running
+ORIGIN = 'http://64.227.11.35:5000' # server address where the bot code is running(for example, http://ip:port), you need to insert it into allowed origins of the  trello's admin's account on the page https://trello.com/app-key
+HOST = '64.227.11.35' #server IP where the bot code is running
 PORT = 5000 # port, where bot's server listen, you need to allow this port with ufw
 URL_TEMPLATE = 'https://trello.com/1/authorize?expiration=never&name=Dialog&scope=read,write,account&key={}&return_url={}/users/{}&callback_method=fragment'
 
-CARD_PATTERN = '{}. {} из списка {} \n {} \n \n'
-BOT_ANSWERS = {
-    'WRONG_COMMAND': 'Такой команды нет. Вот список доступных команд: \n /trello link [url or boardname] \n /trello + [@usernames] [name] \n /trello search [cardname]' ,
-    'NO_LINK_FOUND': 'Эта группа еще не связана ни с одной доской',
-    'assign' : 'Теперь используйте команду /trello assign [teammates]',
-    'comment': 'Теперь используйте команду /trello comment [text]',
-    'SEARCH_NOT_FOUND': 'Карточки не найдены',
-    'IS_OK_RES': 'Это то, что вы искали? \n {} из списка {} \n {}',
-    'LIST_ADD_OK' : 'Теперь новые карточки будут добавляться в список {}',
-    'USER_NOT_FOUND' : 'Пользователи {} не найдены или не авторизованы. Остальные будут назначены',
-    'LINK FOUND': 'Эта группа теперь связана с доской {} \n {} \n Новые карточки сейчас добавляются в список {}',
-    'NEW_LIST': 'Выберите другой список для карточек', 
-    'ACTION_OK' : 'Готово', 
-    'SHOW_CARD': 'Показать в чате', 
-    'WHAT_CARD_SHOW': 'Какую карточку показать?',
+SEP = '__'
+ANSWERS = {
     'NOT_AUTH': 'Вы не авторизованы. Авторизуйтесь по ссылке: {}',
-    'WRONG_BOARD': 'Такой доски нет',
-    'CARD' : '{} \n {} \n Чтобы оставить комментарий или назначить человека, сделайте reply на это сообщение вида "-c comment" или "-a @assignee" соответственно'
+    'menu' : '[Как я могу вам помочь?](https://trello.com/user/boards)',
+    'no_boards': '[У вас нет ни одной доступной доски. Перейдите в Trello](https://trello.com/user/boards)',
+    'no_lists': '[На доске {} нет списков]({})',
+    'board_select': 'Выберите доску',
+    'board_save': '[Активная доска {}. Изменить доску можно в пункте "Выбор доски". Что делаем на доске?]({})',
+    'add_no_boards': 'Ни одна доска еще не была выбрана. Выберите доску, на которой хотите создать задачу',
+    'add_list_select': 'Выберите колонку доски для создания задачи',
+    'add': 'Пришлите задачу в ответ на это сообщение', 
+    'add_success': '[Задача создана! Что делаем?]({})',
+    'delete': 'Удалить задачу {} с доски {}? Восстановление будет невозможно',
+    'delete_confirmed': '[Задача {} удалена. Что делаем?](https://trello.com/user/boards)',
+    'delete_cancel': '[Удаление задачи {} отменено. Что делаем?]({})',
+    'status': 'Выберите новый статус для задачи', 
+    'status_edit': '[Задача {} перенесена в колонку {}. Что делаем?]({})',
+    'edit': 'Пришлите новое название задачи в ответ на сообщение',
+    'edit_save': '[Задача изменена! Новое название: {}. Что делаем?]({})',
+    'comment': 'В ответ на это сообщение отправьте текст комментария',
+    'comment_save': '[Комментарий добавлен. Что делаем?]({})',
+    'tasks': 'На доске {} задач. Как их отобразить?',
+    'card_info': '[название задачи: {} \n название доски: {} \n дата создания: {} \n статус: {}]({})',
+    'show_ten': 'Выберите способ сортировки',
+    'search': 'Выберите опцию поиска',
+    'search_by_board': 'Укажите доску для поиска',
+    'search_by_name': 'Укажите название задачи для поиска',
+    'no_res': 'Найдено 0 результатов. Продолжить поиск?',
+    'search_res': 'Найдено {} результатов. Как их отобразить?',
+    'search_board_select': 'Ни одна доска еще не была выбрана. Выберите доску'
               }
-CARD_OPTIONS = {'comment': 'Комментировать', 'assign': 'Назначить'}
-AVAILABLE_COMMANDS = ['link', '+', 'search']
+BUTTONS = {
+    'card': [('board_select', 'Выбор доски'), ('add', 'Новая задача'), ('edit', 'Редактировать'), ('status', 'Изменить статус'), ('delete', 'Удалить'), ('tasks', 'Все задачи'), ('search', 'Поиск'), ('comment', 'Добавить комментарий'), ('menu', 'В меню')],
+    'menu': [('boards', 'Все доски'), ('board_select', 'Выбор доски'), ('add', 'Новая задача'), ('tasks', 'Все задачи'), ('search','Поиск')],
+    'menu_auth': [('change_account', 'Сменить аккаунт Trello'), ('boards', 'Все доски'), ('board_select', 'Выбор доски'), ('add', 'Новая задача'), ('tasks', 'Все задачи'), ('search','Поиск')],
+    'no_boards': [('menu', 'Вернуться в меню')],
+    'no_lists': [('menu', 'Вернуться в меню')],
+    'board': [('board_save', 'Выбрать доску'), ('menu', 'Вернуться в меню')],
+    'board_save': [('add', 'Новая задача'), ('tasks', 'Все задачи'), ('search', 'Поиск'), ('menu', 'В меню')],
+    'delete': [('delete_confirmed', 'Удалить'), ('delete_cancel', 'Отменить')],
+    'tasks': [('show_ten', 'Показывать по 10'), ('show_all', 'Показать все')],
+    'card_info': [('edit', 'Редактировать'), ('status', 'Изменить статус'), ('delete', 'Удалить'), ('comment', 'Добавить комментарий'), ('menu', 'В меню')],
+    'show_ten': [('old', 'Сначала старые'), ('new', 'Сначала новые'), ('alphabet', 'По алфавиту')],
+    'search': [('search_by_board', 'По доске'), ('search_by_name', 'По названию')],
+    'no_res': [('search', 'Продолжить'), ('menu', 'В меню')]
+    
+}
+CARD_COMMANDS = ['comment', 'edit', 'delete', 'status']
+BOARD_COMMANDS = ['tasks',  'trello']
+

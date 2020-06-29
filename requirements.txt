@@ -1,6 +1,5 @@
-dialog-api==1.33.0
 dialog-bot-sdk>=3.0.3
-google-api-core==1.16.0
+google-api-core>=1.16.0
 pymongo==3.10.1
 Flask==1.1.2
 py-trello==0.16.0
