@@ -62,9 +62,11 @@ class TrelloStrategy(Strategy):
             state = self.db_handler.get(uid, Tables.states.value)
             if not state:
                 state = ''
+            if text == '/start':
+                self._handle_menu(peer=peer, start=True)
             if msg[0] == '/trello':
                 if len(msg) == 1:
-                    self._handle_menu(peer)
+                    self._handle_menu(peer=peer, start=True)
                 elif msg[1] == '+' or msg[1] == 'add':
                     self._handle_command(peer, uid, 'add', msg[2:])
                 elif msg[1] in ['-c', '-с']:
@@ -98,8 +100,10 @@ class TrelloStrategy(Strategy):
         except Exception as e:
             raise e
             
-    def _handle_menu(self, peer):
+    def _handle_menu(self, peer, start=False):
         token = self.db_handler.get(peer.id, Tables.tokens.value)
+        if start:
+            self.bot.messaging.send_message(peer, ANSWERS['help'].format(self.bot.users.get_user_by_id(peer.id).wait().data.name))
         if not token:
             buttons = BUTTONS['menu']
         else:
@@ -113,7 +117,7 @@ class TrelloStrategy(Strategy):
                 ANSWERS['NOT_AUTH'].format(self._get_auth_link(peer.id)))
         
     def _get_boards(self, peer, client):
-        boards = client.list_boards()
+        boards = [x for x in client.get_member('me').get_boards('') if 'organization' not in dir(x)]
         if not boards:
             self.buttons(peer=peer,
                          title=ANSWERS['no_boards'], 
@@ -146,6 +150,9 @@ class TrelloStrategy(Strategy):
                 return
             elif params[1] == 2:
                 self._handle_tasks(peer, client, board.id)
+                return
+            elif params[1] == 3:
+                self._handle_search_by_name(peer, client)
                 return
         self.buttons(peer=peer,
                         title=ANSWERS['board_save'].format(board.name, board.url),
@@ -315,7 +322,7 @@ class TrelloStrategy(Strategy):
                 self.select(peer=peer,
                             text=ANSWERS['search_board_select'],
                             select_title=None,
-                            options={'board_save__{}__2'.format(board.id): board.name for board in client.list_boards()})
+                            options={'board_save__{}__2'.format(board.id): board.name for board in self._get_boards(peer, client)})
                 return
         board = client.get_board(board_id)
         self._print_cards(peer, board.all_cards(), [board], params)
@@ -380,6 +387,13 @@ class TrelloStrategy(Strategy):
                        options={'tasks__{}'.format(board.id): board.name for board in boards})
     
     def _handle_search_by_name(self, peer, client):
+        board_id = self.db_handler.get(peer.id, Tables.boards.value)
+        if not board_id:
+            self.select(peer=peer,
+                            text=ANSWERS['search_board_select'],
+                            select_title=None,
+                            options={'board_save__{}__3'.format(board.id): board.name for board in self._get_boards(peer, client)})
+            return
         self.db_handler.save(peer.id, States.search_results.value, Tables.states.value)
         self.bot.messaging.send_message(peer, ANSWERS['search_by_name'])
         
@@ -389,7 +403,8 @@ class TrelloStrategy(Strategy):
             self.db_handler.save(peer.id, text, Tables.query.value)
         else:
             text = self.db_handler.get(peer.id, Tables.query.value)
-        cards = client.search(text, partial_match=True, models=['cards'], cards_limit=1000)
+        board_id = self.db_handler.get(peer.id, Tables.boards.value)
+        cards = client.search(text, partial_match=True, models=['cards'], cards_limit=1000, board_ids=[board_id])
         self._print_cards(peer, cards, client.list_boards(), params)
             
                                
@@ -422,6 +437,8 @@ class BotWrapper(object):
 if __name__=='__main__':
     wrapper = BotWrapper()
     thread = threading.Thread(target=wrapper.run, args=())
+    thread.daemon = True
     thread.start()
     #app.run(host=IP)
-    serve(app, port=PORT, host=HOST)#, port=PORT)
+    #serve(app, port=PORT, host=HOST)#, port=PORT)
+    create_app(wrapper)
