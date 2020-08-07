@@ -1,4 +1,4 @@
-BOT_TOKEN = ''
+BOT_TOKEN = '241e86e8c21646c194bf556e7c7e50642ed408cc'
 BOT_ENDPOINT = 'demo-eem.transmit.im'
 DBNAME = 'trellobot'
 MONGODBLINK = 'mongodb://localhost:27017/'
@@ -6,15 +6,17 @@ LOGS_FILE = 'trellobot.logs'
 
 #trello
 APP_KEY = '079a5558609ec2719aa62412b30022fc' #trello's admin api key https://trello.com/app-key
-ORIGIN = 'http://64.227.11.35:5000' # server address where the bot code is running(for example, http://ip:port), you need to insert it into allowed origins of the  trello's admin's account on the page https://trello.com/app-key
-HOST = '64.227.11.35' #server IP where the bot code is running
+ORIGIN = 'http://167.172.127.11:5000' # server address where the bot code is running(for example, http://ip:port), you need to insert it into allowed origins of the  trello's admin's account on the page https://trello.com/app-key
+HOST = '167.172.127.11' #server IP where the bot code is running
 PORT = 5000 # port, where bot's server listen, you need to allow this port with ufw
 URL_TEMPLATE = 'https://trello.com/1/authorize?expiration=never&name=Dialog&scope=read,write,account&key={}&return_url={}/users/{}&callback_method=fragment'
 
 SEP = '__'
 ANSWERS = {
-    'NOT_AUTH': 'Вы не авторизованы. Авторизуйтесь по ссылке: {}',
+    'NOT_AUTH': 'Вы не авторизованы. Авторизуйтесь по [ссылке]({})',
+    'auth_success': '{}, Вы успешно авторизовались в Trello! \n Для просмотра своих досок Trello нажмите на "Все доски" \n Для начала работы с доской нажмите на "Выбор доски" \n Для создания задачи на доске нажмите на "Новая задача \n Для просмотра списка задач доски нажмите на "Все задачи" \n Для поиска задач нажмите на "Поиск" \n Для перехода в интерфейс Trello нажмите на текст "Как я могу вам помочь?"',
     'menu' : '[Как я могу вам помочь?](https://trello.com/user/boards)',
+    'help': 'Приветствую, {}! \n Для просмотра своих досок Trello нажмите на "Все доски" \n Для начала работы с доской нажмите на "Выбор доски" \n Для создания задачи на доске нажмите на "Новая задача \n Для просмотра списка задач доски нажмите на "Все задачи" \n Для поиска задач нажмите на "Поиск" \n Для перехода в интерфейс Trello нажмите на текст "Как я могу вам помочь?"',
     'no_boards': '[У вас нет ни одной доступной доски. Перейдите в Trello](https://trello.com/user/boards)',
     'no_lists': '[На доске {} нет списков]({})',
     'board_select': 'Выберите доску',
@@ -54,7 +56,7 @@ BUTTONS = {
     'tasks': [('show_ten', 'Показывать по 10'), ('show_all', 'Показать все')],
     'card_info': [('edit', 'Редактировать'), ('status', 'Изменить статус'), ('delete', 'Удалить'), ('comment', 'Добавить комментарий'), ('menu', 'В меню')],
     'show_ten': [('old', 'Сначала старые'), ('new', 'Сначала новые'), ('alphabet', 'По алфавиту')],
-    'search': [('search_by_board', 'По доске'), ('search_by_name', 'По названию')],
+    'search': [('search_by_board', 'По доскам'), ('search_by_name', 'По названию')],
     'no_res': [('search', 'Продолжить'), ('menu', 'В меню')]
     
 }
